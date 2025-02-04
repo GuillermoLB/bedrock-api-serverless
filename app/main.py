@@ -6,7 +6,7 @@ from fastapi import FastAPI, Request
 
 from app.core.log_config import LogConfig
 from app.dependencies import get_settings
-from app.routers import users
+from app.routers.user_router import users_router
 
 
 logging.config.dictConfig(LogConfig().model_dump())
@@ -31,7 +31,7 @@ app = FastAPI(
 
 
 # Include API routes
-app.include_router(users.router, tags=["Users"])
+app.include_router(users_router)
 
 
 # Middleware to log requests and responses
