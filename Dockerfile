@@ -12,14 +12,12 @@ FROM python:${PYTHON_VERSION}-slim as base
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Keeps Python from buffering stdout and stderr to avoid situations where
-# the application crashes without emitting any logs due to buffering.
+# Keeps Python from buffering stdout and stderr
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/go/dockerfile-user-best-practices/
+# Create a non-privileged user
 ARG UID=10001
 RUN adduser \
     --disabled-password \
@@ -33,23 +31,21 @@ RUN adduser \
 # Install Poetry
 RUN pip install poetry
 
-# Configure Poetry to create virtual environments inside the project directory
-RUN poetry config virtualenvs.in-project true
+# Copy dependency files
+COPY pyproject.toml poetry.lock* ./
 
-# Copy pyproject.toml and poetry.lock to the working directory
-COPY pyproject.toml poetry.lock* /app/
+# Install dependencies
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-cache
 
-# Install dependencies using Poetry
-RUN poetry install --no-root
-
-# Switch to the non-privileged user to run the application.
-USER appuser
-
-# Copy the source code into the container.
+# Copy the source code
 COPY . .
 
-# Expose the port that the application listens on.
+# Switch to non-privileged user
+USER appuser
+
+# Expose port
 EXPOSE 8000
 
-# Run the application.
+# Run the application
 CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

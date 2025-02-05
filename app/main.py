@@ -6,6 +6,7 @@ from fastapi import FastAPI, Request
 
 from app.core.log_config import LogConfig
 from app.dependencies import get_settings
+from app.routers import token_router
 from app.routers.user_router import users_router
 
 
@@ -32,6 +33,7 @@ app = FastAPI(
 
 # Include API routes
 app.include_router(users_router)
+app.include_router(token_router)
 
 
 # Middleware to log requests and responses
