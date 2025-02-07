@@ -13,7 +13,7 @@ def create_user(session: Session, user: UserCreate) -> User:
     if db_user:
         raise UserException(error=Errors.E008.format(
             username=db_user.username), code=400)
-    hashed_password = get_password_hash(user.password)
+    hashed_password = get_password_hash(user.password.get_secret_value())
     db_user = User(
         username=user.username,
         hashed_password=hashed_password)

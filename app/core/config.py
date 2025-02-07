@@ -3,9 +3,6 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # PostgreSQL
-    SQLALCHEMY_DATABASE_URI: str = "postgresql://user:password@localhost:5432/dbname"
-
     # Logging
     LOG_LEVEL: str = "INFO"
     DISABLE_LOGGERS: bool = False
@@ -13,7 +10,7 @@ class Settings(BaseSettings):
     # PostgreSQL
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = ""
-    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_SERVER: str = "db"
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = "postgres"
 

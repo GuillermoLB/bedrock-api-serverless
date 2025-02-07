@@ -18,7 +18,7 @@ settings = get_settings()
 
 
 app = FastAPI(
-    title="Roams AI API",
+    title="Authentication API",
     description="""
 """,
     version="1.0.0",
