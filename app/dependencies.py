@@ -15,6 +15,7 @@ from app.models.user_models import User as UserModel
 
 from app.schemas.user_schemas import User
 from app.services.user_service import verify_token
+import boto3
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -48,8 +49,11 @@ def get_current_active_user(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+def get_bedrock():
+    return boto3.client("bedrock")
+
 
 SettingsDep = Annotated[Settings, Depends(get_settings)]
-SessionDep = Annotated[Session, Depends(get_session)]
-UserDep = Annotated[User, Depends(get_current_active_user)]
+UserDep = Annotated[User, Depends(get_current_active_user)] # So in routes we can use current_user: UserDep instead of current_user: User = Depends(get_current_active_user) -> DRY principle
+BedrockDep = Annotated[get_bedrock, Depends(get_bedrock)]
 
