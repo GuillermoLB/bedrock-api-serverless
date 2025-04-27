@@ -2,10 +2,8 @@ from typing import ClassVar
 
 from pydantic import BaseModel
 
-from app.core.config import Settings
+from app.core.config import settings, Settings
 from app.dependencies import SettingsDep
-
-settings = Settings()
 
 
 class LogConfig(BaseModel):

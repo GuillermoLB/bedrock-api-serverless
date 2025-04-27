@@ -1,11 +1,13 @@
 import logging
 from typing import Annotated
-from fastapi import APIRouter, Depends
+from datetime import timedelta
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from app.dependencies import SettingsDep
-from app.repos import user_repo
-from app.schemas.user_schemas import UserRead, UserCreate
-from app.dependencies import SessionDep
+from sqlalchemy.orm import Session
+
+from app.db.session import get_session
+from app.services.user_service import authenticate_user, create_access_token
+from app.core.config import settings
 
 tokens_router = APIRouter(
     tags=["tokens"],
@@ -14,9 +16,29 @@ tokens_router = APIRouter(
 
 logger = logging.getLogger(__name__)
 
+# Change tokenUrl to match our endpoint
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="tokens/token")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
+# Add token generation endpoint
+@tokens_router.post("/token")
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_session)
+):
+    user = authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, 
+        settings=settings,
+        expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
 
 @tokens_router.get("")
 async def get_token(token: Annotated[str, Depends(oauth2_scheme)]):

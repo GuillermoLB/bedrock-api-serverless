@@ -1,6 +1,6 @@
 import logging
 from fastapi import APIRouter
-from app.dependencies import SessionDep, UserDep
+from app.dependencies import SessionDep
 from app.repos import user_repo
 from app.schemas.user_schemas import UserRead, UserCreate
 

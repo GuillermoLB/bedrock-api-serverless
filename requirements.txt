@@ -12,3 +12,5 @@ alembic
 factory-boy==3.2.0
 pytest_asyncio
 httpx
+pydantic_ssm_settings
+boto3

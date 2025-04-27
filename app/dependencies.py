@@ -1,18 +1,19 @@
 from functools import lru_cache
-from http.client import HTTPException
-from typing import Annotated
+from fastapi import HTTPException
+from typing import Annotated, Any
 from app.error.codes import Errors
 from app.error.exceptions import AuthenticationException
 from sqlalchemy.orm import Session
 
-from fastapi import Depends
+from fastapi import Depends, Header
 from fastapi.security import OAuth2PasswordBearer
 
-from app.core.config import Settings
+from app.core.config import settings, Settings
 from app.db.session import get_session
 
 from app.models.user_models import User as UserModel
 
+from app.schemas.bedrock_session_schemas import BedrockSession
 from app.schemas.user_schemas import User
 from app.services.user_service import verify_token
 import boto3
@@ -21,14 +22,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @lru_cache
 def get_settings():
-    return Settings()
+    return settings
 
 def get_current_user(
     db: Session = Depends(get_session),
     token: str = Depends(oauth2_scheme)
 ):
     try:
-        token_data = verify_token(token, get_settings(), None)
+        token_data = verify_token(token, get_settings())
         user = db.query(UserModel).filter(
             UserModel.username == token_data.username).first()
         if user is None:
@@ -42,18 +43,42 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"}
         )
 
-
 def get_current_active_user(current_user: User = Depends(get_current_user)):
     if current_user.disabled:
         raise AuthenticationException(error=Errors.E003, code=400)
     return current_user
 
+region_name = get_settings().AWS_REGION
 
+@lru_cache()
 def get_bedrock():
-    return boto3.client("bedrock")
+    return boto3.client('bedrock-agent-runtime', region_name=region_name)
 
+@lru_cache()
+def get_cloudwatch():
+    return boto3.client('logs', region_name=region_name)
 
+def get_bedrock_session(session_id: Annotated[str | None, Header()] = None):
+    """
+    Get the Bedrock agent session from the request.
+    """
+    return BedrockSession(session_id=session_id)
+
+def get_bedrock_invocation(bedrock: "BedrockDep", bedrock_session: "BedrockSessionDep"):
+    """
+    Create and get the bedrock message invocation.
+    """
+        # Create the invocation (represents the message)
+    invocation = bedrock.create_invocation(
+        description="Test invocation",
+        sessionIdentifier=bedrock_session.session_id
+    )
+    return invocation["invocationId"]
+
+SessionDep = Annotated[Session, Depends(get_session)]
+BedrockSessionDep = Annotated[BedrockSession, Depends(get_bedrock_session)]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
-UserDep = Annotated[User, Depends(get_current_active_user)] # So in routes we can use current_user: UserDep instead of current_user: User = Depends(get_current_active_user) -> DRY principle
-BedrockDep = Annotated[get_bedrock, Depends(get_bedrock)]
-
+UserDep = Annotated[User, Depends(get_current_active_user)] # NOTE: So in routes we can use current_user: UserDep instead of current_user: User = Depends(get_current_active_user) -> DRY principle
+BedrockDep = Annotated[Any, Depends(get_bedrock)]
+BedrockInvocationDep = Annotated[str, Depends(get_bedrock_invocation)]
+CloudwatchDep = Annotated[Any, Depends(get_cloudwatch)]

@@ -1,39 +1,83 @@
-from app.schemas.knowledge_base_schemas import DataSourceType, KnowledgeBaseModel
-from dotenv import load_dotenv
-from pydantic_settings import BaseSettings
+import os
+from typing import Any, ClassVar, Dict
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_ssm_settings import SsmBaseSettings
 
 
-class Settings(BaseSettings):
+class Settings(SsmBaseSettings):
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+
+    # PostgreSQL
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_SERVER: str
+    POSTGRES_PORT: int
+    POSTGRES_DB: str
+    # AWS
+    AWS_REGION: str
+    AGENT_ID: str
+    AGENT_ALIAS_ID: str
+    KNOWLEDGE_BASE_ID: str
+    ENCRIPTION_KEY_ARN: str
+    MEMORY_TYPE:str
+    MEMORY_MAX_ITEMS: int
+    MESSAGES_MAX_RESULTS: int
+    LOG_GROUP_NAME: str
+    LOG_STREAM_NAME: str
+    RERANKING_MODEL: str
+
+    # JWT
+    SECRET_KEY: str
+    ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
     # Logging
     LOG_LEVEL: str = "INFO"
     DISABLE_LOGGERS: bool = False
 
-    # PostgreSQL
-    POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = ""
-    POSTGRES_SERVER: str = "db"
-    POSTGRES_PORT: int = 5432
-    POSTGRES_DB: str = "postgres"
-    KNOWLEDGE_BASE: KnowledgeBaseModel = KnowledgeBaseModel(
-        knowledge_base_id = "kb12345",
-        data_sources = {
-            DataSourceType.WEB: "web12345",
-            DataSourceType.S3: "s312345"
+    def get_reranking_config(self) -> Dict[str, Any]:
+        """Get reranking configuration"""
+        return {
+            'bedrockRerankingConfiguration': {
+                'metadataConfiguration': {
+                    'selectionMode': 'SELECTIVE',
+                    'selectiveModeConfiguration': {
+                        'fieldsToInclude': [
+                            {'fieldName': 'es_interno'},
+                            {'fieldName': 'compania'},
+                        ],
+                    }
+                },
+                'modelConfiguration': {
+                    'modelArn': self.RERANKING_MODEL,
+                },
+                'numberOfRerankedResults': 4,
+            },
+            'type': 'BEDROCK_RERANKING_MODEL',
         }
-    )
-    AGENT: AgentModel = AgentModel(
-        agent_id = "agent12345",
-        agent_alias_id = "alias12345"
-    )
-
+    
+    def get_session_state(self) -> Dict[str, Any]:
+        """Get session state configuration"""
+        return {
+            'knowledgeBaseConfigurations': [
+                {
+                    'knowledgeBaseId': self.KNOWLEDGE_BASE_ID,
+                    'retrievalConfiguration': {
+                        'vectorSearchConfiguration': {
+                            'numberOfResults': 18,
+                            'overrideSearchType': 'HYBRID',
+                            'rerankingConfiguration': self.get_reranking_config(),
+                        }
+                    },
+                },
+            ]
+        }
+    
     def get_connection_str(self):
         return f"postgresql+psycopg2://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
 
-class Config:
-    env_file = ".env"
-    env_file_encoding = "utf-8"
+settings = Settings(_ssm_prefix="/zappapi/")
 
+print(settings.model_dump())
 
-
-settings = Settings()

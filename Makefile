@@ -20,6 +20,11 @@ shell:
 migrate:
 	docker-compose exec server alembic upgrade head
 
+# Local development
+local:
+	docker-compose up -d db
+	uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
 # Testing
 test:
 	docker-compose exec server pytest

@@ -8,6 +8,8 @@ from app.core.log_config import LogConfig
 from app.dependencies import get_settings
 from app.routers.token_router import tokens_router
 from app.routers.user_router import users_router
+from app.routers.copilot_router import copilot_router
+
 
 
 logging.config.dictConfig(LogConfig().model_dump())
@@ -34,6 +36,7 @@ app = FastAPI(
 # Include API routes
 app.include_router(users_router)
 app.include_router(tokens_router)
+app.include_router(copilot_router)
 
 
 # Middleware to log requests and responses
@@ -53,8 +56,7 @@ async def log_request_response(request: Request, call_next):
     # Log response metadata
     process_time = round((time.time() - start_time) * 1000)
     logger.info(
-        f"Response {request_id}: Status={
-            response.status_code} Duration={process_time}ms "
+        f"Response {request_id}: Status={response.status_code} Duration={process_time}ms "
         f"Method={request.method} Path={path}"
     )
 
