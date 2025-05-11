@@ -7,30 +7,37 @@ from pydantic_ssm_settings import SsmBaseSettings
 class Settings(SsmBaseSettings):
     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
 
+    # AWS credentials
+    AWS_ACCESS_KEY_ID: str = "test-access-key"
+    AWS_SECRET_ACCESS_KEY: str = "test-secret-key"
+    AWS_SESSION_TOKEN: str = "test-session-token"
+    AWS_DEFAULT_REGION: str = "us-east-1"
+    
     # PostgreSQL
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_SERVER: str
-    POSTGRES_PORT: int
-    POSTGRES_DB: str
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
+    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DB: str = "postgres_tests"
+    
     # AWS
-    AWS_REGION: str
-    AGENT_ID: str
-    AGENT_ALIAS_ID: str
-    KNOWLEDGE_BASE_ID: str
-    ENCRIPTION_KEY_ARN: str
-    MEMORY_TYPE:str
-    MEMORY_MAX_ITEMS: int
-    MESSAGES_MAX_RESULTS: int
-    LOG_GROUP_NAME: str
-    LOG_STREAM_NAME: str
-    RERANKING_MODEL: str
-
+    AWS_REGION: str = "us-east-1"
+    AGENT_ID: str = "test-agent-id"
+    AGENT_ALIAS_ID: str = "test-alias-id"
+    KNOWLEDGE_BASE_ID: str = "test-knowledge-base-id"
+    ENCRIPTION_KEY_ARN: str = "test-key-arn"
+    MEMORY_TYPE: str = "DEFAULT"
+    MEMORY_MAX_ITEMS: int = 10
+    MESSAGES_MAX_RESULTS: int = 20
+    LOG_GROUP_NAME: str = "test-log-group"
+    LOG_STREAM_NAME: str = "test-log-stream"
+    RERANKING_MODEL: str = "test:reranking:model"
+    
     # JWT
-    SECRET_KEY: str
-    ALGORITHM: str
+    SECRET_KEY: str = "testsecretkey"
+    ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-
+    
     # Logging
     LOG_LEVEL: str = "INFO"
     DISABLE_LOGGERS: bool = False
@@ -67,6 +74,7 @@ class Settings(SsmBaseSettings):
                             'numberOfResults': 18,
                             'overrideSearchType': 'HYBRID',
                             'rerankingConfiguration': self.get_reranking_config(),
+                            
                         }
                     },
                 },

@@ -61,11 +61,11 @@ def tables(engine, settings: Settings):
     Base.metadata.drop_all(engine)
 
     # Create all tables
-    Base.metadata.create_all(engine)
+    # Base.metadata.create_all(engine)
 
     # Run Alembic migrations
     alembic_cfg = Config(
-        pathlib.Path(__file__).parent.parent.joinpath("alembic.ini")
+        pathlib.Path(__file__).parent.parent.parent.joinpath("alembic.ini")
     )
     alembic_cfg.set_main_option(
         "sqlalchemy.url", settings.get_connection_str())

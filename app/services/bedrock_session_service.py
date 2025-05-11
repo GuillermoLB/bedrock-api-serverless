@@ -41,6 +41,7 @@ def process_memory_response(
     
     # Extract session IDs from each memory content item
     for memory_item in memory_contents:
+        logger.info(f"Memory item: {memory_item}")
         if 'sessionSummary' in memory_item and 'sessionId' in memory_item['sessionSummary']:
             session_id = memory_item['sessionSummary']['sessionId']
             
@@ -71,6 +72,7 @@ def get_user_sessions(
         memoryId=bedrock_sessions_read.memory_id,
         memoryType=bedrock_sessions_read.memory_type
     )
+    logger.info(f"User: {bedrock_sessions_read.memory_id}")
 
     processed_memory_response = process_memory_response(
         response=memory_response

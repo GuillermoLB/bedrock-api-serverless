@@ -44,6 +44,7 @@ async def get_sessions(
     """
     Get the user sessions
     """
+    
     bedrock_sessions_read = BedrockSessionsRead(
         agent_id=settings.AGENT_ID,
         agent_alias_id=settings.AGENT_ALIAS_ID,

@@ -14,3 +14,4 @@ pytest_asyncio
 httpx
 pydantic_ssm_settings
 boto3
+bcrypt
