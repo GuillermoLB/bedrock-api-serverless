@@ -3,6 +3,7 @@ import pathlib
 from typing import AsyncGenerator
 
 import boto3
+import httpx
 from app.tests.mocks.mock_bedrock import mock_bedrock_make_api_call
 from moto import mock_aws
 from app.core.config import Settings
@@ -21,7 +22,7 @@ from alembic.config import Config
 from sqlalchemy import UUID, Engine, create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from app.database import database, password, port, server, user
-from app.dependencies import get_bedrock, get_settings
+from app.dependencies import get_bedrock, get_current_active_user, get_settings
 
 
 @pytest.fixture(scope="session")
@@ -124,11 +125,12 @@ def bedrock(aws_credentials):
 
 
 @pytest_asyncio.fixture()
-async def app(session, settings) -> FastAPI:
+async def app(session, settings, bedrock) -> FastAPI:  # Note: we're adding bedrock parameter here
     from app.main import app
 
+    # Create a function that returns the bedrock client, not a reference to the fixture
     def get_bedrock_override():
-        return bedrock
+        return bedrock  # Return the actual client object, not the fixture function
 
     def get_session_override():
         return session
@@ -145,9 +147,19 @@ async def app(session, settings) -> FastAPI:
     app.dependency_overrides.clear()
 
 
+@pytest.fixture
+def user_1():
+    user = UserFactory()
+    yield user
+
 @pytest_asyncio.fixture()
-async def client(app) -> AsyncGenerator:
-    async with AsyncClient(app=app, base_url="http://test") as client:
+async def client(app, user_1) -> AsyncGenerator:  # Add user_1 as a dependency
+    def get_user_override():
+        return user_1  # Return the user object, not the function
+
+    app.dependency_overrides[get_current_active_user] = get_user_override
+    transport = httpx.ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
 
 
@@ -156,6 +168,7 @@ class UserFactory(SQLAlchemyModelFactory):
         model = User
         sqlalchemy_session = scopedsession
         sqlalchemy_session_persistence = "flush"
+    id = 1
     username = "test_user"
     hashed_password = "test_password"
     disabled = False
