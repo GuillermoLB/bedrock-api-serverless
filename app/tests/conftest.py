@@ -5,7 +5,6 @@ from typing import AsyncGenerator
 import boto3
 import httpx
 from app.tests.mocks.mock_bedrock import mock_bedrock_make_api_call
-from moto import mock_aws
 from app.core.config import Settings
 from app.db.session import get_session
 from app.models.user_models import Base, User
@@ -118,8 +117,6 @@ def aws_credentials() -> None:
     os.environ["AWS_SESSION_TOKEN"] = "testing"
 
 
-with mock_aws():
-    moto_s3 = boto3.client("s3", region_name=region_name)
 
 
 @pytest.fixture(name="bedrock", scope="session")
@@ -133,7 +130,7 @@ def bedrock(aws_credentials):
         yield bedrock_client
 
 
-@pytest_asyncio.fixture()
+@pytest.fixture()
 # Note: we're adding bedrock parameter here
 async def app(session, settings, bedrock) -> FastAPI:
     from app.main import app
@@ -163,7 +160,7 @@ def user_1():
     yield user
 
 
-@pytest_asyncio.fixture()
+@pytest.fixture()
 async def client(app, user_1) -> AsyncGenerator:  # Add user_1 as a dependency
     def get_user_override():
         return user_1  # Return the user object, not the function

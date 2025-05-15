@@ -32,3 +32,17 @@
 **/values.dev.yaml
 LICENSE
 README.md
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+ENV/
+.coverage
+htmlcov/
+.pytest_cache/
+.git
+.github
+*.md
+*.log

@@ -1,4 +1,12 @@
-.PHONY: up down build test clean logs shell migrate
+.PHONY: up down build test clean logs shell migrate test-local test-local-v test-local-cov coverage-report
+
+set_path:
+	export PYTHONPATH=$(pwd)/app
+
+libs:
+	@echo "Installing libraries..."
+	pip install --upgrade pip
+	pip install --progress-bar on --no-cache-dir -r requirements_dev.txt
 
 # Docker commands
 up:
@@ -37,6 +45,22 @@ test-v:
 
 test-cov:
 	docker-compose exec server pytest --cov=app --cov-report=term-missing
+
+# Local testing (without Docker)
+test-local:
+	python -m pytest app/tests
+
+# Local testing with verbose output
+test-local-v:
+	python -m pytest app/tests -v
+
+# Local testing with coverage
+test-local-cov:
+	python -m pytest app/tests --cov=app --cov-report=term-missing --cov-report=html
+
+# Open the coverage report in the browser
+coverage-report:
+	open htmlcov/index.html
 
 # Clean up
 clean:

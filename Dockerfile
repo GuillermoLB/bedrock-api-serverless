@@ -26,10 +26,14 @@ RUN mkdir -p migrations/versions && \
     chown -R appuser:appuser migrations && \
     chmod -R 777 migrations
 
-# Install dependencies
+# Install dependencies - FIXED LINE HERE
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
+    --mount=type=bind,source=requirements_dev.txt,target=requirements_dev.txt \
+    python -m pip install -r requirements_dev.txt
+
+COPY ./app ./app/
+COPY ./migrations ./migrations/
 
 # Copy the source code
 COPY . .

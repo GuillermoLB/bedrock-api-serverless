@@ -12,7 +12,7 @@ services:
     build:
       context: .
     env_file:
-      - .env
+      - .env.docker
     ports:
       - 8000:8000
     volumes:
@@ -31,7 +31,7 @@ services:
     ports:      # Change this line from 'expose:' to 'ports:'
       - "5432:5432"    # This maps container port 5432 to host port 5432
     env_file:
-      - .env
+      - .env.docker
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 10s

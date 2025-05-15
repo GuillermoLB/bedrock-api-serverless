@@ -1,0 +1,12 @@
+-r requirements.txt
+pytest==7.3.1
+pytest-asyncio==0.14.0
+pytest-integration==0.2.3
+pytest-cov
+moto==5.0.2
+pytest-watch==4.2.0
+black==23.9.1
+isort>=5.10.1
+factory-boy==3.3.0
+torch==2.1.0; sys_platform == 'darwin'
+flake8==7.0.0
