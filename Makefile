@@ -17,12 +17,15 @@ shell:
 	docker-compose exec server /bin/bash
 
 # Database
+db:
+	docker-compose up -d db
+
 migrate:
 	docker-compose exec server alembic upgrade head
 
 # Local development
 local:
-	docker-compose up -d db
+	make db
 	uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # Testing

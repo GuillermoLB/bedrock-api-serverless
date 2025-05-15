@@ -43,15 +43,20 @@ def engine(settings: Settings) -> Engine:
         "port": port,
     }
 
-    # Connect to the default database
-    conn = psycopg2.connect(**params)
+    # Connect to the default 'postgres' database, not 'postgres_tests'
+    conn = psycopg2.connect(
+        database="postgres",  # <-- connect to 'postgres', not 'postgres_tests'
+        user=user,
+        password=password,
+        host=server,
+        port=port,
+    )
     conn.autocommit = True
     cursor = conn.cursor()
-
-    # Create the test database
-    print("*****************************************************************************Creating test database...")
     cursor.execute("DROP DATABASE IF EXISTS postgres_tests")
     cursor.execute("CREATE DATABASE postgres_tests")
+    cursor.close()
+    conn.close()
 
     # Connect to the test database
     params["database"] = "postgres_tests"
@@ -100,7 +105,9 @@ def session(engine: Engine, tables):
     # session.close()
     scopedsession.remove()
 
+
 region_name = "eu-central-1"
+
 
 @pytest.fixture(name="aws_credentials", scope="session")
 def aws_credentials() -> None:
@@ -114,10 +121,12 @@ def aws_credentials() -> None:
 with mock_aws():
     moto_s3 = boto3.client("s3", region_name=region_name)
 
+
 @pytest.fixture(name="bedrock", scope="session")
 def bedrock(aws_credentials):
     # Change to bedrock-agent-runtime instead of bedrock
-    bedrock_client = boto3.client("bedrock-agent-runtime", region_name=region_name)
+    bedrock_client = boto3.client(
+        "bedrock-agent-runtime", region_name=region_name)
     with patch(
         "botocore.client.BaseClient._make_api_call", new=mock_bedrock_make_api_call
     ):
@@ -125,7 +134,8 @@ def bedrock(aws_credentials):
 
 
 @pytest_asyncio.fixture()
-async def app(session, settings, bedrock) -> FastAPI:  # Note: we're adding bedrock parameter here
+# Note: we're adding bedrock parameter here
+async def app(session, settings, bedrock) -> FastAPI:
     from app.main import app
 
     # Create a function that returns the bedrock client, not a reference to the fixture
@@ -151,6 +161,7 @@ async def app(session, settings, bedrock) -> FastAPI:  # Note: we're adding bedr
 def user_1():
     user = UserFactory()
     yield user
+
 
 @pytest_asyncio.fixture()
 async def client(app, user_1) -> AsyncGenerator:  # Add user_1 as a dependency

@@ -57,20 +57,90 @@ This project is structured as a modern Python web application using FastAPI with
 
 1. Set up environment variables in `.env` file
 2. Start the PostgreSQL database:
-3. GitHub Copilot
-Here's the content in proper Markdown format with all the necessary formatting annotations:
 
-docker-compose up -d db
+    ```sh
+    make db
+    ```
 
-3. Run the application:
+3. Run the application locally:
 
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    ```sh
+    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    ```
 
+   Or use the Makefile shortcut (starts both db and app):
+
+    ```sh
+    make local
+    ```
 
 ### Docker Deployment
 
-docker-compose up -d
+- **Build images:**
 
+    ```sh
+    make build
+    ```
+
+- **Start all services (app + db):**
+
+    ```sh
+    make up
+    ```
+
+- **Stop all services:**
+
+    ```sh
+    make down
+    ```
+
+- **View logs:**
+
+    ```sh
+    make logs
+    ```
+
+- **Open a shell in the app container:**
+
+    ```sh
+    make shell
+    ```
+
+### Database Management
+
+- **Run migrations:**
+
+    ```sh
+    make migrate
+    ```
+
+### Running Tests
+
+- **Run tests inside the Docker container:**
+
+    ```sh
+    make test
+    ```
+
+- **Run tests with verbose output:**
+
+    ```sh
+    make test-v
+    ```
+
+- **Run tests with coverage report:**
+
+    ```sh
+    make test-cov
+    ```
+
+### Cleaning Up
+
+- **Remove containers, volumes, and Python cache files:**
+
+    ```sh
+    make clean
+    ```
 
 ## API Endpoints
 
