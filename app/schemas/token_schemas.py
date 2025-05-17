@@ -9,3 +9,15 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+
+class TokenCreate(BaseModel):
+    username: str
+    expire_minutes: int
+    secret_key: str
+    algorithm: str
+
+
+class TokenVerify(Token):
+    secret_key: str
+    algorithm: str

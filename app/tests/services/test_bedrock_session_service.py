@@ -13,7 +13,7 @@ from app.tests.conftest import UserFactory, session
 
 def test_create_bedrock_session_works(session: Session, bedrock: Any):
     bedrock_session_create = BedrockSessionCreate(
-        encryption_key_arn="1234"
+        encryption_key_arn="1234"  # TODO: take from a settings fixture
     )
 
     bedrock_session = create_session(
