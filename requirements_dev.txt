@@ -10,3 +10,4 @@ isort>=5.10.1
 factory-boy==3.3.0
 torch==2.1.0; sys_platform == 'darwin'
 flake8==7.0.0
+hypothesis
