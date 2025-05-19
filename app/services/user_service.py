@@ -39,7 +39,7 @@ def verify_token(token: TokenVerify) -> TokenData:
         payload = jwt.decode(token.access_token, token.secret_key,
                              algorithms=[token.algorithm])
         username: str = payload.get("sub")
-        if username is None:
+        if username == "": # TODO: Move to a pydantic validator
             raise AuthenticationException(error=Errors.E010, code=401)
         token_data = TokenData(username=username)
     except JWTError:

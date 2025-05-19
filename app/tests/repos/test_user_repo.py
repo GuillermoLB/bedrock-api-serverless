@@ -17,3 +17,12 @@ def test_create_existing_user_fails(session):
     new_user = UserCreate(username="existing_user", password="test_password")
     with pytest.raises(UserException, match="E008"):
         user_repo.create_user(session=session, user=new_user)
+
+def test_read_user_by_name_works(session):
+    user = UserFactory()
+    user_read = user_repo.read_user_by_name(session, user.username)
+    assert user.username == user_read.username
+
+def test_non_existing_user_raises_exception(session):
+    with pytest.raises(UserException, match="E011"):
+        user_repo.read_user_by_name(session, "non_existing_user")

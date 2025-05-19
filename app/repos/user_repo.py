@@ -25,4 +25,6 @@ def create_user(session: Session, user: UserCreate) -> User:
 
 def read_user_by_name(session: Session, username: str) -> User:
     db_user = session.query(User).filter(User.username == username).first()
+    if db_user is None:
+        raise UserException(error=Errors.E011, code=404)
     return db_user

@@ -20,6 +20,19 @@ def mock_bedrock_make_api_call(self, operation_name, kwarg):
             "sessionArn": f"arn:aws:bedrock:us-east-1:123456789012:session/{str(uuid.uuid4())}"
         }
         return response
+    
+    if operation_name == "GetAgentMemory":
+        response = {
+            "memoryContents": [
+                {
+                    "sessionSummary": {
+                        "sessionId": str(uuid.uuid4()),
+                        "summaryText": "Test conversation about Python"
+                    }
+                }
+            ]
+        }
+        return response
     # If we don't want to patch the API call
     return orig(self, operation_name, kwarg)
 
