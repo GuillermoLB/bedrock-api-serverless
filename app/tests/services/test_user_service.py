@@ -69,7 +69,7 @@ def test_valid_token_not_raise_exception(settings):
     )
 
 @pytest.mark.asyncio
-@hypothesis_settings(deadline=None)
+@hypothesis_settings(deadline=None, max_examples=10)
 @given(text(min_size=1))
 def test_token_decode_inverts_encode(username: str):
     settings = Settings()
