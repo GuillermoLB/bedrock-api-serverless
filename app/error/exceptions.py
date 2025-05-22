@@ -10,11 +10,13 @@ class CustomException(Exception):
         return self.error
 
 
+# change for more general classes like validationerror
 class UserException(CustomException):
 
     """
     All User' related exceptions with specific error codes
     """
+    # TODO: add  status code
 
 
 class AuthenticationException(CustomException):

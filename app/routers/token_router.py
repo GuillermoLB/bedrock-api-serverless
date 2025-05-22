@@ -22,25 +22,28 @@ async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_session)
 ):
-    user = authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
+    try:
+        user = authenticate_user(db, form_data.username, form_data.password)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        token_create = TokenCreate(
+            username=user.username,
+            expire_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
+            secret_key=settings.SECRET_KEY,
+            algorithm=settings.ALGORITHM
         )
-    token_create = TokenCreate(
-        username=user.username,
-        expire_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
-        secret_key=settings.SECRET_KEY,
-        algorithm=settings.ALGORITHM
-    )
-    token = create_access_token(
-        token_create
-    )
-    return token
+        token = create_access_token(
+            token_create
+        )
+        return token
+    except Exception as e:
+        raise HTTPException(status_code=e.code, detail=e.error)
 
 
 @tokens_router.get("")
-async def get_token(token:UserDep):
+async def get_token(token: UserDep):
     return {"token": token}
