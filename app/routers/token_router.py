@@ -1,11 +1,10 @@
 import logging
-from typing import Annotated
-from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.db.session import get_session
+from app.dependencies import UserDep
 from app.schemas.token_schemas import TokenCreate
 from app.services.user_service import authenticate_user, create_access_token
 from app.core.config import settings
@@ -16,11 +15,6 @@ tokens_router = APIRouter(
 )
 
 logger = logging.getLogger(__name__)
-
-# Change tokenUrl to match our endpoint
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="tokens/token")
-
-# Add token generation endpoint
 
 
 @tokens_router.post("/token")
@@ -48,5 +42,5 @@ async def login_for_access_token(
 
 
 @tokens_router.get("")
-async def get_token(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_token(token:UserDep):
     return {"token": token}

@@ -19,7 +19,7 @@ from app.schemas.user_schemas import User
 from app.services.user_service import verify_token
 import boto3
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="tokens/token")
 
 
 @lru_cache
