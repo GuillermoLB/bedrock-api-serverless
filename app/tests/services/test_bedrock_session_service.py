@@ -1,9 +1,5 @@
 from typing import Any
-from uuid import uuid4
-from app.error.exceptions import UserException
-from app.repos import user_repo
 from app.schemas.bedrock_session_schemas import BedrockSessionCreate
-from app.schemas.user_schemas import UserCreate
 from app.services.bedrock_session_service import create_session
 from sqlalchemy.orm import Session
 import pytest

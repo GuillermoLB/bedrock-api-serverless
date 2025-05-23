@@ -8,13 +8,13 @@ from hypothesis import settings as hypothesis_settings
 from jose import JWTError, jwt
 
 from app.core.config import Settings
-from app.error.exceptions import AuthenticationException
+from app.error.exceptions import UnauthorizedException
 from app.schemas.token_schemas import TokenCreate, TokenVerify
 from app.services.user_service import create_access_token, verify_token
 
 
 @pytest.mark.asyncio
-def test_no_username_in_token_raises_exception(settings):
+async def test_no_username_in_token_raises_exception(settings):
     token_create = TokenCreate(
         username="",
         expire_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -30,11 +30,11 @@ def test_no_username_in_token_raises_exception(settings):
         algorithm=settings.ALGORITHM
     )
 
-    with pytest.raises(AuthenticationException):
+    with pytest.raises(UnauthorizedException):
         verify_token(token_verify)
 
 @pytest.mark.asyncio
-def test_invalid_token_raises_exception(settings):
+async def test_invalid_token_raises_exception(settings):
     # Create a token verify object
     valid_token_verify = TokenVerify(
         access_token="invalid_token",
@@ -42,12 +42,12 @@ def test_invalid_token_raises_exception(settings):
         secret_key=settings.SECRET_KEY,
         algorithm=settings.ALGORITHM
     )
-    with pytest.raises(AuthenticationException):
+    with pytest.raises(UnauthorizedException):
         verify_token(valid_token_verify)
 
 
 @pytest.mark.asyncio
-def test_valid_token_not_raise_exception(settings):
+async def test_valid_token_not_raise_exception(settings):
     payload = {
         "sub": "test_user",  # Valid username
         "exp": datetime.now(dt.timezone.utc) + timedelta(minutes=30)  # Use dt.timezone

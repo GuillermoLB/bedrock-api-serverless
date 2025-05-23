@@ -1,5 +1,5 @@
 from uuid import uuid4
-from app.error.exceptions import UserException
+from app.error.exceptions import ResourceNotFoundException, ValidationException
 from app.repos import user_repo
 from app.schemas.user_schemas import UserCreate
 import pytest
@@ -12,10 +12,10 @@ def test_create_user_works(session):
     user = user_repo.create_user(session, new_user)
     assert user.username == "test_user"
 
-def test_create_existing_user_fails(session):
+def test_create_existing_user_raises_exception(session):
     UserFactory(username="existing_user")
     new_user = UserCreate(username="existing_user", password="test_password")
-    with pytest.raises(UserException, match="E008"):
+    with pytest.raises(ValidationException, match="E008"):
         user_repo.create_user(session=session, user=new_user)
 
 def test_read_user_by_name_works(session):
@@ -24,5 +24,5 @@ def test_read_user_by_name_works(session):
     assert user.username == user_read.username
 
 def test_non_existing_user_raises_exception(session):
-    with pytest.raises(UserException, match="E011"):
+    with pytest.raises(ResourceNotFoundException, match="E011"):
         user_repo.read_user_by_name(session, "non_existing_user")

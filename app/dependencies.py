@@ -1,8 +1,7 @@
 from functools import lru_cache
-from fastapi import HTTPException
 from typing import Annotated, Any
 from app.error.codes import Errors
-from app.error.exceptions import AuthenticationException
+from app.error.exceptions import UnauthorizedException
 from sqlalchemy.orm import Session
 
 from fastapi import Depends, Header
@@ -11,8 +10,8 @@ from fastapi.security import OAuth2PasswordBearer
 from app.core.config import settings, Settings
 from app.db.session import get_session
 
-from app.models.user_models import User as UserModel
 
+from app.repos import user_repo
 from app.schemas.bedrock_session_schemas import BedrockSession
 from app.schemas.token_schemas import TokenVerify
 from app.schemas.user_schemas import User
@@ -31,31 +30,20 @@ def get_current_user(
     db: Session = Depends(get_session),
     token: str = Depends(oauth2_scheme)
 ):
-    try:
-        token_verify = TokenVerify(
-            access_token=token,
-            token_type="bearer",
-            secret_key=get_settings().SECRET_KEY,
-            algorithm=get_settings().ALGORITHM
-        )
-        token_data = verify_token(token_verify)
-        user = db.query(UserModel).filter(
-            UserModel.username == token_data.username).first()
-        if user is None:
-            raise AuthenticationException(
-                error=Errors.E011, code=401)  # User not found
-        return user
-    except AuthenticationException as e:
-        raise HTTPException(
-            status_code=e.code,
-            detail=Errors.E010,  # Invalid or expired token
-            headers={"WWW-Authenticate": "Bearer"}
-        )
+    token_verify = TokenVerify(
+        access_token=token,
+        token_type="bearer",
+        secret_key=get_settings().SECRET_KEY,
+        algorithm=get_settings().ALGORITHM
+    )
+    token_data = verify_token(token_verify)
+    user = user_repo.get_user_by_id(db, token_data.username)
+    return user
 
 
 def get_current_active_user(current_user: User = Depends(get_current_user)):
     if current_user.disabled:
-        raise AuthenticationException(error=Errors.E003, code=400)
+        raise UnauthorizedException(error=Errors.E003, code=400)
     return current_user
 
 

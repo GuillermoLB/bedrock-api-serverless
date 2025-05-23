@@ -1,8 +1,9 @@
 from .codes import Errors, Warnings
 
 
-class CustomException(Exception):
-    def __init__(self, error: Errors | Warnings, code: int):
+class BaseAppException(Exception):
+    """Base exception for our application"""
+    def __init__(self, error: Errors | Warnings, code: int = 500):
         self.error = error
         self.code = code
 
@@ -10,17 +11,16 @@ class CustomException(Exception):
         return self.error
 
 
-# change for more general classes like validationerror
-class UserException(CustomException):
+class ResourceNotFoundException(BaseAppException):
+    """Raised when a requested resource is not found"""
+    def __init__(self, error: str):
+        super().__init__(error, code=404)
+class ValidationException(BaseAppException):
+    """Raised when input validation fails"""
+    def __init__(self, error: str, code: int = 400):
+        super().__init__(error, code=code)
 
-    """
-    All User' related exceptions with specific error codes
-    """
-    # TODO: add  status code
-
-
-class AuthenticationException(CustomException):
-
-    """
-    All User' related exceptions with specific error codes
-    """
+class UnauthorizedException(BaseAppException):
+    """Raised when user is not authorized"""
+    def __init__(self, error: str):
+        super().__init__(error, code=401)
