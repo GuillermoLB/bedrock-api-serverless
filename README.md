@@ -4,7 +4,7 @@ A FastAPI-based service that provides a secure API for interacting with AWS Bedr
 
 ## Architecture
 
-This project is structured as a modern Python web application using FastAPI with the following key components:
+This project is structured as a modern Python application using FastAPI with the following key components:
 
 ### Core Components
 
