@@ -173,4 +173,4 @@ This API leverages AWS Bedrock's features:
 By storing conversations directly in AWS Bedrock sessions, this architecture:
 - Simplifies the backend design
 - Reduces database costs and complexity
-- Takes advantage of AWS's infrastructure for storing and processing conversation data
+- Takes advantage of AWS's infrastructure for storing and processing conversation
