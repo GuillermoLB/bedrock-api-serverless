@@ -10,7 +10,6 @@ class Settings(SsmBaseSettings):
     # AWS credentials
     AWS_ACCESS_KEY_ID: str = "test-access-key"
     AWS_SECRET_ACCESS_KEY: str = "test-secret-key"
-    AWS_SESSION_TOKEN: str = "test-session-token"
     AWS_DEFAULT_REGION: str = "us-east-1"
     
     # PostgreSQL
