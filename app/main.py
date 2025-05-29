@@ -90,7 +90,7 @@ def lambda_handler(event, context):
     logger.debug(f"API Event: {event}")
 
     # Rest of your handler code...
-    handler = Mangum(app)
+    handler = Mangum(app, api_gateway_base_path=settings.API_GATEWAY_BASE_PATH)
     response = handler(event, context)
     return response
 

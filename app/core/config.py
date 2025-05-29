@@ -32,6 +32,7 @@ class Settings(SsmBaseSettings):
     LOG_GROUP_NAME: str = "test-log-group"
     LOG_STREAM_NAME: str = "test-log-stream"
     RERANKING_MODEL: str = "test:reranking:model"
+    API_GATEWAY_BASE_PATH: str = ""
 
     # JWT
     SECRET_KEY: str = "testsecretkey"
