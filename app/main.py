@@ -1,15 +1,16 @@
 import logging
+import logging.config  # <-- Add this line
 import time
 from uuid import uuid4
 
 from fastapi import FastAPI, Request
+from mangum import Mangum
 
 from app.core.log_config import LogConfig
 from app.dependencies import get_settings
 from app.routers.token_router import tokens_router
 from app.routers.user_router import users_router
 from app.routers.copilot_router import copilot_router
-
 
 
 logging.config.dictConfig(LogConfig().model_dump())
@@ -60,6 +61,37 @@ async def log_request_response(request: Request, call_next):
         f"Method={request.method} Path={path}"
     )
 
+    return response
+
+
+def lambda_handler(event, context):
+    """Sample pure Lambda function
+
+    Parameters
+    ----------
+    event: dict, required
+        API Gateway Lambda Proxy Input Format
+
+        Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
+
+    context: object, required
+        Lambda Context runtime methods and attributes
+
+        Context doc: https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
+
+    Returns
+    ------
+    API Gateway Lambda Proxy Output Format: dict
+
+        Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
+    """
+
+    # Use the logger you've defined
+    logger.debug(f"API Event: {event}")
+
+    # Rest of your handler code...
+    handler = Mangum(app)
+    response = handler(event, context)
     return response
 
 

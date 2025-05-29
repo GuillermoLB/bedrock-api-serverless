@@ -5,20 +5,21 @@ from pydantic_ssm_settings import SsmBaseSettings
 
 
 class Settings(SsmBaseSettings):
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+    model_config = SettingsConfigDict(
+        env_file='.env', env_file_encoding='utf-8')
 
     # AWS credentials
     AWS_ACCESS_KEY_ID: str = "test-access-key"
     AWS_SECRET_ACCESS_KEY: str = "test-secret-key"
     AWS_DEFAULT_REGION: str = "us-east-1"
-    
+
     # PostgreSQL
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = "postgres_tests"
-    
+
     # AWS
     AWS_REGION: str = "us-east-1"
     AGENT_ID: str = "test-agent-id"
@@ -31,13 +32,13 @@ class Settings(SsmBaseSettings):
     LOG_GROUP_NAME: str = "test-log-group"
     LOG_STREAM_NAME: str = "test-log-stream"
     RERANKING_MODEL: str = "test:reranking:model"
-    
+
     # JWT
     SECRET_KEY: str = "testsecretkey"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     TOKEN_TYPE: str = "Bearer"
-    
+
     # Logging
     LOG_LEVEL: str = "INFO"
     DISABLE_LOGGERS: bool = False
@@ -62,7 +63,7 @@ class Settings(SsmBaseSettings):
             },
             'type': 'BEDROCK_RERANKING_MODEL',
         }
-    
+
     def get_session_state(self) -> Dict[str, Any]:
         """Get session state configuration"""
         return {
@@ -74,18 +75,15 @@ class Settings(SsmBaseSettings):
                             'numberOfResults': 18,
                             'overrideSearchType': 'HYBRID',
                             'rerankingConfiguration': self.get_reranking_config(),
-                            
+
                         }
                     },
                 },
             ]
         }
-    
+
     def get_connection_str(self):
         return f"postgresql+psycopg2://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
 
-settings = Settings(_ssm_prefix="/zappapi/")
-
-print(settings.model_dump())
-
+settings = Settings()

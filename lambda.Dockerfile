@@ -1,9 +1,9 @@
-FROM public.ecr.aws/lambda/python:3.10
+FROM public.ecr.aws/lambda/python:3.13
 
-RUN yum install -y gcc gcc-c++ make
-COPY api/requirements.txt .
-RUN pip install -r requirements.txt
+COPY app/ ./app/
+COPY requirements.txt .
 
-COPY api .
+RUN python3.13 -m pip install -r requirements.txt -t .
 
-CMD ["src.main.handler"]
+# Set the correct handler (module.function)
+CMD ["app.main.lambda_handler"]
