@@ -18,7 +18,7 @@ class Settings(SsmBaseSettings):
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_PORT: int = 5432
-    POSTGRES_DB: str = "postgres_tests"
+    POSTGRES_DB: str = "postgres"
 
     # AWS
     AWS_REGION: str = "us-east-1"

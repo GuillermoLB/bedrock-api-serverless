@@ -22,6 +22,9 @@ services:
       db:
         condition: service_healthy
     command: uvicorn 'app.main:app' --host=0.0.0.0 --port=8000 --reload
+    networks:
+      - bedrock-network  # Add this network
+  
   db:
     image: postgres
     restart: always
@@ -37,6 +40,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - bedrock-network  # Add this network
+
 volumes:
   db-data:
+
+# Define a custom network with a specific name
+networks:
+  bedrock-network:
+    name: bedrock-network  # This explicit name makes it easier to reference
 
