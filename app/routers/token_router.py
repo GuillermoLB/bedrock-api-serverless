@@ -35,7 +35,14 @@ async def login_for_access_token(
         )
         return token
     except Exception as e:
-        raise HTTPException(status_code=e.code, detail=e.error)
+        # Only use .code and .error for custom exceptions
+        from app.error.exceptions import BaseAppException
+        if isinstance(e, BaseAppException):
+            raise HTTPException(status_code=e.code, detail=e.error)
+        else:
+            logger.exception("Unexpected error during login")
+            raise HTTPException(
+                status_code=500, detail="Internal server error")
 
 
 @tokens_router.get("")

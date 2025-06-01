@@ -31,7 +31,10 @@ Resources:
             Method: any
       Environment:
         Variables:
-          POSTGRES_SERVER:
+          POSTGRES_SERVER: db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
 
     Metadata:
       Dockerfile: Lambda.Dockerfile

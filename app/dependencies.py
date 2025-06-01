@@ -37,7 +37,7 @@ def get_current_user(
         algorithm=get_settings().ALGORITHM
     )
     token_data = verify_token(token_verify)
-    user = user_repo.get_user_by_id(db, token_data.username)
+    user = user_repo.read_user_by_name(db, token_data.username)
     return user
 
 

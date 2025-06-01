@@ -26,4 +26,10 @@ async def create_user(session: SessionDep, user: UserCreate):
         user = user_repo.create_user(session, user)
         return user
     except Exception as e:
-        raise HTTPException(status_code=e.code, detail=e.error)
+        from app.error.exceptions import BaseAppException
+        if isinstance(e, BaseAppException):
+            raise HTTPException(status_code=e.code, detail=e.error)
+        else:
+            logger.exception("Unexpected error during user creation")
+            raise HTTPException(
+                status_code=500, detail="Internal server error")

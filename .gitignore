@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# aws sam
+.aws-sam/
+
 # VSCode
 .vscode/
 
@@ -28,6 +31,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.python-version
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

@@ -1,10 +1,9 @@
 import os
 from typing import Any, ClassVar, Dict
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic_ssm_settings import SsmBaseSettings
 
 
-class Settings(SsmBaseSettings):
+class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='.env', env_file_encoding='utf-8')
 

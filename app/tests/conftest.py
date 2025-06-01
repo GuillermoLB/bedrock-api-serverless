@@ -117,8 +117,6 @@ def aws_credentials() -> None:
     os.environ["AWS_SESSION_TOKEN"] = "testing"
 
 
-
-
 @pytest.fixture(name="bedrock", scope="session")
 def bedrock(aws_credentials):
     # Change to bedrock-agent-runtime instead of bedrock
