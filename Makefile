@@ -8,6 +8,9 @@ libs:
 	pip install --upgrade pip
 	pip install --progress-bar on --no-cache-dir -r requirements_dev.txt
 
+stop_postgres_service:
+	sudo systemctl stop postgresql
+
 # Docker commands
 up:
 	docker-compose up -d
